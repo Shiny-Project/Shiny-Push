@@ -1,9 +1,33 @@
 # Shiny-Push
 
-Shiny 推送信息处理与发射系统。
 
-本系统是为了达到以下目的而开发的。
 
-* 集中处理各来源向各渠道推送的需求。
+## QuickStart
 
-* 处理、解析数据，生成推送内容。
+<!-- add docs here for user -->
+
+see [egg docs][egg] for more detail.
+
+### Development
+
+```bash
+$ npm i
+$ npm run dev
+$ open http://localhost:7001/
+```
+
+### Deploy
+
+```bash
+$ npm start
+$ npm stop
+```
+
+### npm scripts
+
+- Use `npm run lint` to check code style.
+- Use `npm test` to run unit test.
+- Use `npm run autod` to auto detect dependencies upgrade, see [autod](https://www.npmjs.com/package/autod) for more detail.
+
+
+[egg]: https://eggjs.org
