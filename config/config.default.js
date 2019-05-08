@@ -23,6 +23,17 @@ module.exports = appInfo => {
     // myAppName: 'egg',
   };
 
+  config.sequelize = {
+    dialect: 'mysql',
+    host: '127.0.0.1',
+    port: 3306,
+    database: 'mirai',
+    define: {
+      // prevent sequelize from pluralizing table names
+      freezeTableName: true,
+    },
+  };
+
   return {
     ...config,
     ...userConfig,
