@@ -10,7 +10,13 @@ class PushController extends Controller {
       [ this.ctx.status, this.ctx.body ] = ResponseUtils.errorResponse(400, 'missing_parameters', '缺少必要参数');
       return;
     }
-    this.ctx.body = await this.service.push.push(channels, text);
+    const { images } = this.ctx.request.body;
+    const postImages = images || [];
+    if (postImages.length > 0) {
+      this.ctx.body = await this.service.push.push(channels, text, postImages);
+    } else {
+      this.ctx.body = await this.service.push.push(channels, text);
+    }
   }
 }
 

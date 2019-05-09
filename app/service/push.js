@@ -10,23 +10,53 @@ class PushService extends Service {
         channel,
         text: content,
         info: '{}',
-        images,
+        images: JSON.stringify(images),
         status: 'pending',
       };
+      // 创建任务
       const createJob = await this.app.model.PushHistory.create(job);
+      // 记录日志
+      await this.app.model.PushLog.create({
+        status: 'job_created',
+        job_id: createJob.id,
+        channel,
+        info: '{}',
+      });
       createdJobs.push(createJob);
       this.ctx.runInBackground(async () => {
-        try {
-          const result = await this.service.pusher[channel].send(content);
-          createJob.update({
-            info: JSON.stringify(result),
-            status: 'success',
-          });
-        } catch (e) {
-          createJob.update({
-            info: JSON.stringify(e),
-            status: 'failed',
-          });
+        let retries = 3;
+        while (retries > 0) {
+          // 重试三次
+          try {
+            const result = await this.service.pusher[channel].send(createJob.id, content, images);
+            // 更新任务状态
+            await createJob.update({
+              info: JSON.stringify(result),
+              status: 'success',
+            });
+            // 记录日志
+            await this.app.model.PushLog.create({
+              status: 'finished',
+              job_id: createJob.id,
+              channel,
+              info: '{}',
+            });
+            retries = 0;
+          } catch (e) {
+            // 记录错误
+            await createJob.update({
+              info: JSON.stringify(e),
+              status: 'failed',
+            });
+            // 记录日志
+            await this.app.model.PushLog.create({
+              status: 'retry',
+              job_id: createJob.id,
+              channel,
+              info: JSON.stringify({ retry: 4 - retries, error: e }),
+            });
+            retries--;
+          }
         }
       });
     }
