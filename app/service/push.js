@@ -1,8 +1,9 @@
 'use strict';
 const Service = require('egg').Service;
+const CommonUtils = require('../util/common');
 class PushService extends Service {
   async push(channels = [], content = '', images = []) {
-    const availableChannels = [ 'twitter' ];
+    const availableChannels = [ 'twitter', 'weibo' ];
     channels = channels.filter(i => availableChannels.includes(i));
     const createdJobs = [];
     for (const channel of channels) {
@@ -43,6 +44,7 @@ class PushService extends Service {
             });
             retries = 0;
           } catch (e) {
+            console.log(e);
             // 记录错误
             await createJob.update({
               info: JSON.stringify(e),
@@ -53,9 +55,10 @@ class PushService extends Service {
               status: 'retry',
               job_id: createJob.id,
               channel,
-              info: JSON.stringify({ retry: 4 - retries, error: e }),
+              info: JSON.stringify({ retry: 4 - retries, error: e.toString() }),
             });
             retries--;
+            await CommonUtils.sleep(1000);
           }
         }
       });
