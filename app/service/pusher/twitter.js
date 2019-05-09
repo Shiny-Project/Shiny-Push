@@ -2,6 +2,7 @@
 
 const Service = require('egg').Service;
 const Twit = require('twit');
+const twitter = require('twitter-text');
 
 class TwitterService extends Service {
   async init() {
@@ -33,6 +34,9 @@ class TwitterService extends Service {
     if (!this.twitterClient) {
       await this.init();
     }
+    if (!this.isValid(text)) {
+      throw new Error('Tweet 超出长度限制');
+    }
     return new Promise((resolve, reject) => {
       this.twitterClient.post('statuses/update', {
         status: text,
@@ -43,6 +47,12 @@ class TwitterService extends Service {
         resolve(data);
       });
     });
+  }
+  async send(text) {
+    return await this.sendTweet(text);
+  }
+  isValid(text) {
+    return twitter.parseTweet(text).valid;
   }
 }
 

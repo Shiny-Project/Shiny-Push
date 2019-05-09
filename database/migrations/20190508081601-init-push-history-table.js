@@ -17,8 +17,8 @@ module.exports = {
       info: TEXT,
       text: TEXT,
       image: TEXT,
-      created_at: DATE,
-      updated_at: DATE,
+      createdAt: DATE,
+      updatedAt: DATE,
     });
   },
 

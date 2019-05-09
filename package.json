@@ -12,7 +12,8 @@
     "egg-scripts": "^2.11.0",
     "egg-sequelize": "^4.3.1",
     "mysql2": "^1.6.5",
-    "twit": "^2.2.11"
+    "twit": "^2.2.11",
+    "twitter-text": "^3.0.0"
   },
   "devDependencies": {
     "autod": "^3.0.1",
