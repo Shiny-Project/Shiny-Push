@@ -1,7 +1,6 @@
 'use strict';
 
 const Service = require('egg').Service;
-const fs = require('fs');
 const FormStream = require('formstream');
 
 class WeiboService extends Service {
@@ -17,16 +16,12 @@ class WeiboService extends Service {
     }
     const {
       accessToken,
+      suffix,
     } = JSON.parse(records[0].credential);
+    this.suffix = suffix;
     this.accessToken = accessToken;
   }
   async sendWeibo(text) {
-    if (!this.accessToken) {
-      await this.init();
-    }
-    if (!this.isValid(text)) {
-      throw new Error('微博超出长度限制');
-    }
     const response = await this.ctx.curl('https://api.weibo.com/2/statuses/share.json', {
       method: 'POST',
       dataType: 'json',
@@ -41,12 +36,6 @@ class WeiboService extends Service {
     return response.data;
   }
   async sendWeiboWithImages(text, images) {
-    if (!this.accessToken) {
-      await this.init();
-    }
-    if (!this.isValid(text)) {
-      throw new Error('微博超出长度限制');
-    }
     const form = new FormStream();
     form.field('access_token', this.accessToken);
     form.field('status', text);
@@ -69,14 +58,46 @@ class WeiboService extends Service {
    * @param {string[]} images (optional) 图片路径（只支持一张，超过一张会被忽略）
    */
   async send(jobId, text, images = []) {
-    this.jobId = jobId;
-    if (images.length > 0) {
-      return await this.sendWeiboWithImages(text, images);
+    if (!this.accessToken) {
+      await this.init();
     }
-    return await this.sendWeibo(text);
+    this.jobId = jobId;
+    let pushText = text;
+    // 文本截断
+    if (!this.isValid(pushText + this.suffix)) {
+      while (!this.isValid(pushText + this.suffix)) {
+        pushText = pushText.slice(0, pushText.length - 1);
+      }
+    }
+    if (images.length > 0) {
+      return await this.sendWeiboWithImages(pushText + this.suffix, images);
+    }
+    return await this.sendWeibo(pushText + this.suffix);
   }
-  async isValid(text) {
-    return true;
+  getWeiboLength(text) {
+    const getLength = a => {
+      if (!a) return 0;
+      // eslint-disable-next-line no-control-regex
+      const b = a.match(/[^\x00-\xff]/g);
+      return a.length + (b ? b.length : 0);
+    };
+    const c = 41,
+      d = 140,
+      e = 20,
+      g = text.match(/(http|https):\/\/[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)+([-A-Z0-9a-z_\$\.\+\!\*\(\)\/\,\:;@&=\?~#%]*)*/gi) || [];
+    let h = 0;
+    let f = text;
+    for (let i = 0, j = g.length; i < j; i++) {
+      const k = getLength(g[i]);
+      if (/^(http:\/\/t.cn)/.test(g[i])) { continue; }
+      /^(http:\/\/)+(t.sina.com.cn|t.sina.cn)/.test(g[i]) || /^(http:\/\/)+(weibo.com|weibo.cn)/.test(g[i]) ? h += k <= c ? k : k <= d ? e : k - d + e : h += k <= d ? e : k - d + e;
+      f = f.replace(g[i], '');
+    }
+    const l = Math.ceil((h + getLength(f)) / 2);
+    return l;
+  }
+  isValid(text) {
+    return this.getWeiboLength(text) < 140;
   }
 }
 

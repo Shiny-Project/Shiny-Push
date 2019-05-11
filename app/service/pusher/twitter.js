@@ -32,9 +32,6 @@ class TwitterService extends Service {
     return this.twitterClient;
   }
   async sendTweet(text) {
-    if (!this.twitterClient) {
-      await this.init();
-    }
     if (!this.isValid(text)) {
       throw new Error('Tweet 超出长度限制');
     }
@@ -43,9 +40,6 @@ class TwitterService extends Service {
     })).data;
   }
   async sendTweetWithImages(text, mediaIds) {
-    if (!this.twitterClient) {
-      await this.init();
-    }
     if (!this.isValid(text)) {
       throw new Error('Tweet 超出长度限制');
     }
@@ -55,9 +49,6 @@ class TwitterService extends Service {
     })).data;
   }
   async uploadImages(images = []) {
-    if (!this.twitterClient) {
-      await this.init();
-    }
     for (const image of images) {
       await this.app.model.PushLog.create({
         channel: 'twitter',
@@ -97,6 +88,9 @@ class TwitterService extends Service {
    * @param {*} images (optional) 图片路径
    */
   async send(jobId, text, images = []) {
+    if (!this.twitterClient) {
+      await this.init();
+    }
     this.jobId = jobId;
     if (images.length > 0) {
       const mediaIds = await this.uploadImages(images);
