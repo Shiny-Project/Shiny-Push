@@ -15,6 +15,7 @@ module.exports = {
       channel: STRING(30),
       status: STRING(30),
       info: TEXT,
+      event_id: INTEGER,
       text: TEXT,
       image: TEXT,
       createdAt: DATE,

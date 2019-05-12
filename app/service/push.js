@@ -48,7 +48,7 @@ class PushService extends Service {
             // 记录错误
             await createJob.update({
               info: JSON.stringify(e),
-              status: 'failed',
+              status: 'fail',
             });
             // 记录日志
             await this.app.model.PushLog.create({

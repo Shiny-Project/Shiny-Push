@@ -91,15 +91,25 @@ class TwitterService extends Service {
     if (!this.twitterClient) {
       await this.init();
     }
+    let pushText = text;
+    // 文本截断
+    if (!this.isValid(pushText)) {
+      while (!this.isValid(pushText)) {
+        pushText = pushText.slice(0, pushText.length - 1);
+      }
+    }
     this.jobId = jobId;
     if (images.length > 0) {
       const mediaIds = await this.uploadImages(images);
-      return await this.sendTweetWithImages(text, mediaIds);
+      return await this.sendTweetWithImages(pushText, mediaIds);
     }
-    return await this.sendTweet(text);
+    return await this.sendTweet(pushText);
   }
   isValid(text) {
     return twitter.parseTweet(text).valid;
+  }
+  getTweetLength(text) {
+    return twitter.parseTweet(text).weightedLength;
   }
 }
 

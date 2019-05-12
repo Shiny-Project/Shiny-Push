@@ -7,6 +7,7 @@ module.exports = app => {
     channel: STRING(30),
     status: STRING(30),
     info: TEXT,
+    event_id: INTEGER,
     text: TEXT,
     image: TEXT,
     created_at: { type: DATE, field: 'createdAt' },
