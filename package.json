@@ -31,7 +31,7 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=egg-server-Shiny-Push",
+    "start": "egg-scripts start --env=prod --workers=2 --title=egg-server-Shiny-Push",
     "stop": "egg-scripts stop --title=egg-server-Shiny-Push",
     "dev": "egg-bin dev",
     "debug": "egg-bin debug",
