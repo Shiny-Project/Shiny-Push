@@ -13,4 +13,5 @@ run/
 typings/
 .nyc_output/
 config/config.local.js
-config/config.production.js
+config/config.prod.js
+database/config.json
