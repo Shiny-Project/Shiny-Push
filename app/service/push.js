@@ -11,7 +11,7 @@ class PushService extends Service {
         channel,
         text: content,
         info: '{}',
-        images: JSON.stringify(images),
+        image: JSON.stringify(images),
         status: 'pending',
       };
       // 创建任务
