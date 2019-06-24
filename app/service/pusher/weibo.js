@@ -70,7 +70,8 @@ class WeiboService extends Service {
       }
     }
     if (images.length > 0) {
-      return await this.sendWeiboWithImages(pushText + this.suffix, images);
+      // return await this.sendWeiboWithImages(pushText + this.suffix, images);
+      return await this.sendWeibo(pushText + this.suffix);
     }
     return await this.sendWeibo(pushText + this.suffix);
   }
