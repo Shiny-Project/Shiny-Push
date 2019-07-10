@@ -43,6 +43,7 @@ class WeiboService extends Service {
     const response = await this.ctx.curl('https://api.weibo.com/2/statuses/share.json', {
       method: 'POST',
       headers: form.headers(),
+      timeout: 10000,
       dataType: 'json',
       stream: form,
     });
