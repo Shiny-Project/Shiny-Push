@@ -26,10 +26,13 @@ class PushService extends Service {
       createdJobs.push(createJob);
       this.ctx.runInBackground(async () => {
         let retries = 3;
+        let allowImages = true;
         while (retries > 0) {
           // 重试三次
           try {
-            const result = await this.service.pusher[channel].send(createJob.id, content, images);
+            const result = allowImages
+              ? await this.service.pusher[channel].send(createJob.id, content, images)
+              : await this.service.pusher[channel].send(createJob.id, content);
             // 更新任务状态
             await createJob.update({
               info: JSON.stringify(result),
@@ -58,6 +61,11 @@ class PushService extends Service {
               info: JSON.stringify({ retry: 4 - retries, error: e.toString() }),
             });
             retries--;
+            // 如果重试三次&带图 再试一次没图的
+            if (retries === 0 && images.length > 0) {
+              allowImages = false;
+              retries++;
+            }
             await CommonUtils.sleep(1000);
           }
         }
