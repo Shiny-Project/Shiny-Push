@@ -70,12 +70,7 @@ class WeiboService extends Service {
       }
     }
     if (images.length > 0) {
-      try {
-        return await this.sendWeiboWithImages(pushText + this.suffix, images);
-      }
-      catch (e) {
-        if (e.name === "ResponseTimeoutError") {} else {throw e;}
-      }
+      return await this.sendWeiboWithImages(pushText + this.suffix, images);
     }
     return await this.sendWeibo(pushText + this.suffix);
   }
