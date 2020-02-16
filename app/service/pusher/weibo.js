@@ -7,7 +7,7 @@ class WeiboService extends Service {
   async init() {
     const records = await this.app.model.Account.findAll({
       where: {
-        name: 'shiny',
+        name: this.account || 'shiny',
         platform: 'weibo',
       },
     });
@@ -56,12 +56,14 @@ class WeiboService extends Service {
    * @param {number} jobId 跟踪用 jobId
    * @param {string[]} text 微博文本
    * @param {string[]} images (optional) 图片路径（只支持一张，超过一张会被忽略）
+   * @param {string} account 指定账号名
    */
-  async send(jobId, text, images = []) {
+  async send(jobId, text, images = [], account) {
+    this.jobId = jobId;
+    this.account = account;
     if (!this.accessToken) {
       await this.init();
     }
-    this.jobId = jobId;
     let pushText = text;
     // 文本截断
     if (!this.isValid(pushText + this.suffix)) {

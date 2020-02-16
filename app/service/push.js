@@ -2,7 +2,14 @@
 const Service = require('egg').Service;
 const CommonUtils = require('../util/common');
 class PushService extends Service {
-  async push(channels = [], content = '', images = []) {
+  /**
+   * 推送
+   * @param {string[]} channels 渠道名
+   * @param {string} content 内容
+   * @param {string[]} images 图片路径
+   * @param {string} account 指定账号
+   */
+  async push(channels = [], content = '', images = [], account) {
     const availableChannels = [ 'twitter', 'weibo' ];
     channels = channels.filter(i => availableChannels.includes(i));
     const createdJobs = [];
@@ -31,8 +38,8 @@ class PushService extends Service {
           // 重试三次
           try {
             const result = allowImages
-              ? await this.service.pusher[channel].send(createJob.id, content, images)
-              : await this.service.pusher[channel].send(createJob.id, content);
+              ? await this.service.pusher[channel].send(createJob.id, content, images, account)
+              : await this.service.pusher[channel].send(createJob.id, content, [], account);
             // 更新任务状态
             await createJob.update({
               info: JSON.stringify(result),
