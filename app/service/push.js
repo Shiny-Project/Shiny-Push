@@ -69,7 +69,7 @@ class PushService extends Service {
             });
             retries--;
             // 如果重试三次&带图 再试一次没图的
-            if (retries === 0 && images.length > 0) {
+            if (retries === 0 && images.length > 0 && allowImages === true) {
               allowImages = false;
               retries++;
             }
