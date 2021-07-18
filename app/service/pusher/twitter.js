@@ -55,6 +55,7 @@ class TwitterService extends Service {
         job_id: this.jobId,
         status: 'upload_image',
         info: JSON.stringify({ path: image }),
+        time: Date.now(),
       });
       const mediaIds = [];
       try {
@@ -69,6 +70,7 @@ class TwitterService extends Service {
           job_id: this.jobId,
           status: 'upload_image_success',
           info: JSON.stringify({ path: image }),
+          time: Date.now(),
         });
       } catch (e) {
         await this.app.model.PushLog.create({
@@ -76,6 +78,7 @@ class TwitterService extends Service {
           job_id: this.jobId,
           status: 'upload_image_fail',
           info: JSON.stringify({ error: e }),
+          time: Date.now(),
         });
       }
       return mediaIds;

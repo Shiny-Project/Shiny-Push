@@ -10,6 +10,7 @@ module.exports = app => {
     event_id: INTEGER,
     text: TEXT,
     image: TEXT,
+    time: DATE(3),
     created_at: { type: DATE, field: 'createdAt' },
     updated_at: { type: DATE, field: 'updatedAt' },
   });

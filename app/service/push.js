@@ -29,6 +29,7 @@ class PushService extends Service {
         job_id: createJob.id,
         channel,
         info: '{}',
+        time: Date.now(),
       });
       createdJobs.push(createJob);
       this.ctx.runInBackground(async () => {
@@ -51,6 +52,7 @@ class PushService extends Service {
               job_id: createJob.id,
               channel,
               info: '{}',
+              time: Date.now(),
             });
             retries = 0;
           } catch (e) {
@@ -66,6 +68,7 @@ class PushService extends Service {
               job_id: createJob.id,
               channel,
               info: JSON.stringify({ retry: 4 - retries, error: e.toString() }),
+              time: Date.now(),
             });
             retries--;
             // 如果重试三次&带图 再试一次没图的
