@@ -7,10 +7,10 @@
     "declarations": true
   },
   "dependencies": {
-    "egg": "^2.15.1",
+    "egg": "^2.29.4",
     "egg-mysql": "^3.0.0",
-    "egg-scripts": "^2.11.0",
-    "egg-sequelize": "^4.3.1",
+    "egg-scripts": "^2.14.0",
+    "egg-sequelize": "^6.0.0",
     "formstream": "^1.1.0",
     "mysql2": "^1.6.5",
     "twit": "^2.2.11",
