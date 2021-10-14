@@ -16,11 +16,7 @@ class PushController extends Controller {
         }
         const { images } = this.ctx.request.body;
         const postImages = images || [];
-        if (postImages.length > 0) {
-            this.ctx.body = await this.service.push.push(channels, text, postImages, account);
-        } else {
-            this.ctx.body = await this.service.push.push(channels, text, [], account);
-        }
+        this.ctx.body = await this.service.push.push(channels, text, postImages, account);
     }
 }
 

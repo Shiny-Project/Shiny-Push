@@ -7,6 +7,7 @@
     "declarations": true
   },
   "dependencies": {
+    "axios": "^0.23.0",
     "egg": "^2.29.4",
     "egg-mysql": "^3.0.0",
     "egg-scripts": "^2.14.0",
