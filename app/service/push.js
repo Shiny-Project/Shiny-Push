@@ -10,8 +10,15 @@ class PushService extends Service {
      * @param {string} account 指定账号
      */
     async push(channels = [], content = "", images = [], account) {
-        const availableChannels = ["twitter", "weibo"];
+        const availableChannels = ["twitter", "weibo", "telegram"];
         channels = channels.filter((i) => availableChannels.includes(i));
+        if (channels.length === 0) {
+            this.ctx.status = 400;
+            return {
+                status: "error",
+                info: "不支持该推送渠道",
+            };
+        }
         const createdJobs = [];
         for (const channel of channels) {
             const job = {
