@@ -79,7 +79,7 @@ class TelegramService extends Service {
             });
         }
     }
-    async send(jobId, text, images = [], account) {
+    async send({ jobId, text, images = [], account }) {
         this.jobId = jobId;
         this.account = account;
         if (!this.apiKey || !this.channel) {

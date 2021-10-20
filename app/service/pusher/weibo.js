@@ -55,7 +55,7 @@ class WeiboService extends Service {
      * @param {string[]} images (optional) 图片路径（只支持一张，超过一张会被忽略）
      * @param {string} account 指定账号名
      */
-    async send(jobId, text, images = [], account) {
+    async send({ jobId, text, images = [], account }) {
         this.jobId = jobId;
         this.account = account;
         if (!this.accessToken) {

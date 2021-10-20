@@ -94,7 +94,7 @@ class TwitterService extends Service {
      * @param {*} text Tweet 文本
      * @param {*} images (optional) 图片路径
      */
-    async send(jobId, text, images = []) {
+    async send({ jobId, text, images = [] }) {
         if (!this.twitterClient) {
             await this.init();
         }
