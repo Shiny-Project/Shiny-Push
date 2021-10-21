@@ -3,6 +3,7 @@ const fs = require("fs");
 const Service = require("egg").Service;
 const axios = require("axios").default;
 const FormData = require("form-data");
+const CommonUtils = require("../../util/common");
 
 class TelegramService extends Service {
     async init() {
@@ -15,9 +16,11 @@ class TelegramService extends Service {
         if (records.length < 1) {
             throw new Error("无可用 Twitter 渠道账号");
         }
-        const { channel, apiKey } = JSON.parse(records[0].credential);
+        const { channel, apiKey, prefix, suffix } = JSON.parse(records[0].credential);
         this.channel = channel;
         this.apiKey = apiKey;
+        this.prefix = prefix;
+        this.suffix = suffix;
     }
     async sendToChannel(text) {
         const response = await axios.post(
@@ -79,13 +82,31 @@ class TelegramService extends Service {
             });
         }
     }
-    async send({ jobId, text, images = [], account }) {
+    async send({ jobId, text, images = [], account, eventId, title, link, level }) {
         this.jobId = jobId;
         this.account = account;
         if (!this.apiKey || !this.channel) {
             await this.init();
         }
-        const sentMessage = await this.sendToChannel(text);
+        let pushText = text;
+        if (this.prefix) {
+            pushText =
+                `${CommonUtils.template(this.suffix, {
+                    eventId,
+                    title,
+                    link,
+                    level,
+                })}` + pushText;
+        }
+        if (this.suffix) {
+            pushText += `${CommonUtils.template(this.suffix, {
+                eventId,
+                title,
+                link,
+                level,
+            })}`;
+        }
+        const sentMessage = await this.sendToChannel(pushText);
         if (images.length > 0) {
             for (const image of images) {
                 await this.sendImageToChannel(image, sentMessage.result?.message_id);

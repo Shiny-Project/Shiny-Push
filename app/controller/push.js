@@ -5,7 +5,7 @@ const ResponseUtils = require("../util/response");
 
 class PushController extends Controller {
     async send() {
-        const { channels, text, account, eventId } = this.ctx.request.body;
+        const { channels, text, account, eventId, title, link, level } = this.ctx.request.body;
         if (!channels || !text) {
             [this.ctx.status, this.ctx.body] = ResponseUtils.errorResponse(
                 400,
@@ -22,6 +22,9 @@ class PushController extends Controller {
             postImages,
             account,
             eventId,
+            title,
+            link,
+            level,
         });
     }
 }
