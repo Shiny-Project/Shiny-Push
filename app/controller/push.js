@@ -18,8 +18,8 @@ class PushController extends Controller {
         const postImages = images || [];
         this.ctx.body = await this.service.push.push({
             channels,
-            text,
-            postImages,
+            content: text,
+            images: postImages,
             account,
             eventId,
             title,

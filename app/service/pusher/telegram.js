@@ -28,7 +28,6 @@ class TelegramService extends Service {
             {
                 chat_id: `@${this.channel}`,
                 text,
-                disable_notification: true,
             }
         );
         return response.data;
@@ -90,21 +89,29 @@ class TelegramService extends Service {
         }
         let pushText = text;
         if (this.prefix) {
-            pushText =
+            try {
+                pushText =
                 `${CommonUtils.template(this.suffix, {
                     eventId,
                     title,
                     link,
                     level,
                 })}` + pushText;
+            } catch (e) {
+                // ignore
+            }
         }
         if (this.suffix) {
-            pushText += `${CommonUtils.template(this.suffix, {
-                eventId,
-                title,
-                link,
-                level,
-            })}`;
+            try {
+                pushText += `${CommonUtils.template(this.suffix, {
+                    eventId,
+                    title,
+                    link,
+                    level,
+                })}`;
+            } catch (e) {
+                // ignore
+            }
         }
         const sentMessage = await this.sendToChannel(pushText);
         if (images.length > 0) {
