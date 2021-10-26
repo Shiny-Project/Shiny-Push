@@ -91,7 +91,7 @@ class TelegramService extends Service {
         if (this.prefix) {
             try {
                 pushText =
-                `${CommonUtils.template(this.suffix, {
+                `${CommonUtils.template(this.prefix, {
                     eventId,
                     title,
                     link,
