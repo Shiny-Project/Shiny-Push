@@ -1,6 +1,7 @@
 "use strict";
 const Service = require("egg").Service;
 const CommonUtils = require("../util/common");
+const Lock = require('../util/lock');
 class PushService extends Service {
     async push({ channels = [], content = "", images = [], account, eventId, title, link, level }) {
         const availableChannels = ["twitter", "weibo", "telegram"];
@@ -35,6 +36,8 @@ class PushService extends Service {
             this.ctx.runInBackground(async () => {
                 let retries = 3;
                 let allowImages = true;
+                const channelLock = Lock.get(channel);
+                await channelLock.acquire();
                 while (retries > 0) {
                     // 重试三次
                     try {
@@ -86,6 +89,7 @@ class PushService extends Service {
                         await CommonUtils.sleep(1000);
                     }
                 }
+                channelLock.release();
             });
         }
         return createdJobs;
