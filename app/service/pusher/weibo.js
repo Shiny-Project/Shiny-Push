@@ -25,6 +25,7 @@ class WeiboService extends Service {
             data: {
                 access_token: this.accessToken,
                 status: text,
+                rip: "127.0.0.1",
             },
         });
         if (response.status !== 200) {
@@ -36,6 +37,7 @@ class WeiboService extends Service {
         const form = new FormStream();
         form.field("access_token", this.accessToken);
         form.field("status", text);
+        form.field("rip", "127.0.0.1");
         form.file("pic", images[0]);
         const response = await this.ctx.curl("https://api.weibo.com/2/statuses/share.json", {
             method: "POST",
