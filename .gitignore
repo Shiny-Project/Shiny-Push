@@ -13,3 +13,4 @@ typings/
 config/config.local.js
 config/config.prod.js
 database/config.json
+.env

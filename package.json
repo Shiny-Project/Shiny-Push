@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "axios": "^0.23.0",
+    "dotenv": "^16.0.1",
     "egg": "^2.29.4",
     "egg-mysql": "^3.0.0",
     "egg-scripts": "^2.14.0",
