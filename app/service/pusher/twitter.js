@@ -2,6 +2,7 @@
 
 const Service = require("egg").Service;
 const Twit = require("twit");
+const { TwitterApi } = require("twitter-api-v2");
 const twitter = require("twitter-text");
 const fs = require("fs");
 
@@ -29,26 +30,30 @@ class TwitterService extends Service {
             strictSSL: true,
         });
 
+        this.v2Client = new TwitterApi({
+            appKey: consumerKey,
+            appSecret: consumerSecret,
+            accessToken,
+            accessSecret: accessTokenSecret,
+        }).v2;
+
         return this.twitterClient;
     }
     async sendTweet(text) {
         if (!this.isValid(text)) {
             throw new Error("Tweet 超出长度限制");
         }
-        return (
-            await this.twitterClient.post("statuses/update", {
-                status: text,
-            })
-        ).data;
+        return (await this.v2Client.tweet(text)).data;
     }
     async sendTweetWithImages(text, mediaIds) {
         if (!this.isValid(text)) {
             throw new Error("Tweet 超出长度限制");
         }
         return (
-            await this.twitterClient.post("statuses/update", {
-                status: text,
-                media_ids: mediaIds,
+            await this.v2Client.tweet(text, {
+                media: {
+                    media_ids: mediaIds,
+                },
             })
         ).data;
     }
