@@ -15,9 +15,15 @@ class WeiboService extends Service {
         if (records.length < 1) {
             throw new Error("无可用 Weibo 渠道账号");
         }
-        const { accessToken, suffix } = JSON.parse(records[0].credential);
-        this.suffix = suffix;
+        const account = records[0];
+
+        const { accessToken } = JSON.parse(account.credential);
         this.accessToken = accessToken;
+
+        if (account.config) {
+            const { suffix } = JSON.parse(account.config);
+            this.suffix = suffix || '';
+        }
     }
     async sendWeibo(text) {
         const response = await this.ctx.curl("https://api.weibo.com/2/statuses/share.json", {

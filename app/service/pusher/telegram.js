@@ -16,11 +16,18 @@ class TelegramService extends Service {
         if (records.length < 1) {
             throw new Error("无可用 Twitter 渠道账号");
         }
-        const { channel, apiKey, prefix, suffix } = JSON.parse(records[0].credential);
-        this.channel = channel;
+
+        const account = records[0];
+
+        const { apiKey } = JSON.parse(account.credential);
         this.apiKey = apiKey;
-        this.prefix = prefix;
-        this.suffix = suffix;
+
+        if (account.config) {
+            const { channel, prefix, suffix } = JSON.parse(account.config);
+            this.channel = channel;
+            this.prefix = prefix || '';
+            this.suffix = suffix || '';
+        }
     }
     async sendToChannel(text) {
         const response = await axios.post(
@@ -91,12 +98,12 @@ class TelegramService extends Service {
         if (this.prefix) {
             try {
                 pushText =
-                `${CommonUtils.template(this.prefix, {
-                    eventId,
-                    title,
-                    link,
-                    level,
-                })}` + pushText;
+                    `${CommonUtils.template(this.prefix, {
+                        eventId,
+                        title,
+                        link,
+                        level,
+                    })}` + pushText;
             } catch (e) {
                 // ignore
             }
