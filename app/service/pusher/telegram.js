@@ -1,32 +1,24 @@
 "use strict";
 const fs = require("fs");
-const Service = require("egg").Service;
 const axios = require("axios").default;
 const FormData = require("form-data");
 const CommonUtils = require("../../util/common");
+const BasePusher = require("./base");
 
-class TelegramService extends Service {
-    async init() {
-        const records = await this.app.model.Account.findAll({
-            where: {
-                name: this.account || "shiny",
-                platform: "telegram",
-            },
-        });
-        if (records.length < 1) {
-            throw new Error("无可用 Twitter 渠道账号");
-        }
+class TelegramService extends BasePusher {
+    async init({ account, jobId }) {
+        this.jobId = jobId;
 
-        const account = records[0];
+        const credential = await this.getCredential({ account, channel: "telegram" });
 
-        const { apiKey } = JSON.parse(account.credential);
+        const { apiKey } = credential;
         this.apiKey = apiKey;
 
         if (account.config) {
             const { channel, prefix, suffix } = JSON.parse(account.config);
             this.channel = channel;
-            this.prefix = prefix || '';
-            this.suffix = suffix || '';
+            this.prefix = prefix || "";
+            this.suffix = suffix || "";
         }
     }
     async sendToChannel(text) {
@@ -78,7 +70,6 @@ class TelegramService extends Service {
                 time: Date.now(),
             });
         } catch (e) {
-            console.log(e);
             await this.app.model.PushLog.create({
                 channel: "telegram",
                 job_id: this.jobId,
@@ -89,11 +80,7 @@ class TelegramService extends Service {
         }
     }
     async send({ jobId, text, images = [], account, eventId, title, link, level }) {
-        this.jobId = jobId;
-        this.account = account;
-        if (!this.apiKey || !this.channel) {
-            await this.init();
-        }
+        await this.init({ account, jobId });
         let pushText = text;
         if (this.prefix) {
             try {

@@ -1,28 +1,21 @@
 "use strict";
 
-const Service = require("egg").Service;
 const FormStream = require("formstream");
-require('dotenv').config()
+const BasePusher = require("./base");
+require("dotenv").config();
 
-class WeiboService extends Service {
-    async init() {
-        const records = await this.app.model.Account.findAll({
-            where: {
-                name: this.account || "shiny",
-                platform: "weibo",
-            },
-        });
-        if (records.length < 1) {
-            throw new Error("无可用 Weibo 渠道账号");
-        }
-        const account = records[0];
+class WeiboService extends BasePusher {
+    async init({ account, jobId }) {
+        this.jobId = jobId;
 
-        const { accessToken } = JSON.parse(account.credential);
+        const credential = await this.getCredential({ account, channel: "weibo" });
+
+        const { accessToken } = credential;
         this.accessToken = accessToken;
 
         if (account.config) {
             const { suffix } = JSON.parse(account.config);
-            this.suffix = suffix || '';
+            this.suffix = suffix || "";
         }
     }
     async sendWeibo(text) {
@@ -65,11 +58,7 @@ class WeiboService extends Service {
      * @param {string} account 指定账号名
      */
     async send({ jobId, text, images = [], account }) {
-        this.jobId = jobId;
-        this.account = account;
-        if (!this.accessToken) {
-            await this.init();
-        }
+        await this.init({ account, jobId });
         let pushText = text;
         // 文本截断
         if (!this.isValid(pushText + this.suffix)) {

@@ -1,42 +1,44 @@
 "use strict";
 
-const Service = require("egg").Service;
 const Twit = require("twit");
 const { TwitterApi } = require("twitter-api-v2");
 const twitter = require("twitter-text");
 const fs = require("fs");
+const BasePusher = require("./base");
 
-class TwitterService extends Service {
-    async init() {
-        const records = await this.app.model.Account.findAll({
-            where: {
-                name: "shiny",
-                platform: "twitter",
-            },
-        });
-        if (records.length < 1) {
-            throw new Error("无可用 Twitter 渠道账号");
+class TwitterService extends BasePusher {
+    async init({ account, jobId }) {
+        this.jobId = jobId;
+
+        const credential = await this.getCredential({ account, channel: "twitter" });
+        const { consumerKey, consumerSecret, accessToken, accessTokenSecret } = credential;
+
+        if (!this.hasClient({ account, channel: "twitter" })) {
+            this.setClient({
+                account,
+                channel: "twitter",
+                client: [
+                    new Twit({
+                        consumer_key: consumerKey,
+                        consumer_secret: consumerSecret,
+                        access_token: accessToken,
+                        access_token_secret: accessTokenSecret,
+                        timeout_ms: 60 * 1000,
+                        strictSSL: true,
+                    }),
+                    new TwitterApi({
+                        appKey: consumerKey,
+                        appSecret: consumerSecret,
+                        accessToken,
+                        accessSecret: accessTokenSecret,
+                    }).v2,
+                ],
+            });
         }
-        const { consumerKey, consumerSecret, accessToken, accessTokenSecret } = JSON.parse(
-            records[0].credential
-        );
 
-        this.twitterClient = new Twit({
-            consumer_key: consumerKey,
-            consumer_secret: consumerSecret,
-            access_token: accessToken,
-            access_token_secret: accessTokenSecret,
-            timeout_ms: 60 * 1000,
-            strictSSL: true,
-        });
-
-        this.v2Client = new TwitterApi({
-            appKey: consumerKey,
-            appSecret: consumerSecret,
-            accessToken,
-            accessSecret: accessTokenSecret,
-        }).v2;
-
+        const [twitterClient, v2Client] = this.getClient({ account, channel: "twitter" });
+        this.twitterClient = twitterClient;
+        this.v2Client = v2Client;
         return this.twitterClient;
     }
     async sendTweet(text) {
@@ -99,10 +101,8 @@ class TwitterService extends Service {
      * @param {*} text Tweet 文本
      * @param {*} images (optional) 图片路径
      */
-    async send({ jobId, text, images = [] }) {
-        if (!this.twitterClient) {
-            await this.init();
-        }
+    async send({ jobId, text, images = [], account }) {
+        await this.init({ account, jobId });
         let pushText = text;
         // 文本截断
         if (!this.isValid(pushText)) {
@@ -110,7 +110,6 @@ class TwitterService extends Service {
                 pushText = pushText.slice(0, pushText.length - 1);
             }
         }
-        this.jobId = jobId;
         if (images.length > 0) {
             const mediaIds = await this.uploadImages(images);
             return await this.sendTweetWithImages(pushText, mediaIds);
