@@ -10,7 +10,7 @@ class TwitterService extends BasePusher {
     async init({ account, jobId }) {
         this.jobId = jobId;
 
-        const credential = await this.getCredential({ account, channel: "twitter" });
+        const [credential] = await this.getCredential({ account, channel: "twitter" });
         const { consumerKey, consumerSecret, accessToken, accessTokenSecret } = credential;
 
         if (!this.hasClient({ account, channel: "twitter" })) {

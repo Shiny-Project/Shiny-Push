@@ -4,8 +4,8 @@ const Service = require("egg").Service;
 class NoAvailableCredentialError extends Error {}
 
 class BasePusher extends Service {
-    constructor() {
-        super();
+    constructor(args) {
+        super(args);
         this.credentialMap = new Map();
         this.clientMap = new Map();
     }
@@ -29,10 +29,11 @@ class BasePusher extends Service {
         }
 
         const credential = JSON.parse(records[0].credential);
+        const config = JSON.parse(records[0].config || '{}');
 
-        this.credentialMap.set(identifier, credential);
+        this.credentialMap.set(identifier, [credential, config]);
 
-        return credential;
+        return [credential, config];
     }
 
     async hasClient({ account, channel }) {

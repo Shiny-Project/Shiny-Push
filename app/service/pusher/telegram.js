@@ -9,17 +9,15 @@ class TelegramService extends BasePusher {
     async init({ account, jobId }) {
         this.jobId = jobId;
 
-        const credential = await this.getCredential({ account, channel: "telegram" });
+        const [credential, config] = await this.getCredential({ account, channel: "telegram" });
 
         const { apiKey } = credential;
         this.apiKey = apiKey;
 
-        if (account.config) {
-            const { channel, prefix, suffix } = JSON.parse(account.config);
-            this.channel = channel;
-            this.prefix = prefix || "";
-            this.suffix = suffix || "";
-        }
+        const { channel, prefix, suffix } = config;
+        this.channel = channel;
+        this.prefix = prefix || "";
+        this.suffix = suffix || "";
     }
     async sendToChannel(text) {
         const response = await axios.post(

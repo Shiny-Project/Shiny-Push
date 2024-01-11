@@ -8,15 +8,13 @@ class WeiboService extends BasePusher {
     async init({ account, jobId }) {
         this.jobId = jobId;
 
-        const credential = await this.getCredential({ account, channel: "weibo" });
+        const [credential, config] = await this.getCredential({ account, channel: "weibo" });
 
         const { accessToken } = credential;
         this.accessToken = accessToken;
 
-        if (account.config) {
-            const { suffix } = JSON.parse(account.config);
-            this.suffix = suffix || "";
-        }
+        const { suffix } = config;
+        this.suffix = suffix || "";
     }
     async sendWeibo(text) {
         const response = await this.ctx.curl("https://api.weibo.com/2/statuses/share.json", {

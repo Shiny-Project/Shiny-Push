@@ -7,6 +7,7 @@ module.exports = (app) => {
         platform: STRING(30),
         name: STRING(30),
         credential: TEXT,
+        config: TEXT,
         created_at: { type: DATE, field: "createdAt" },
         updated_at: { type: DATE, field: "updatedAt" },
     });
