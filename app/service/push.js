@@ -17,6 +17,7 @@ class PushService extends Service {
         for (const channel of channels) {
             const job = {
                 channel,
+                account,
                 text: content,
                 info: "{}",
                 image: JSON.stringify(images),

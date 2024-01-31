@@ -6,6 +6,7 @@ module.exports = (app) => {
         id: { type: INTEGER, primaryKey: true, autoIncrement: true },
         channel: STRING(30),
         status: STRING(30),
+        account: STRING(30),
         info: TEXT,
         event_id: INTEGER,
         text: TEXT,
