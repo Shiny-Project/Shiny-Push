@@ -36,17 +36,17 @@ class BasePusher extends Service {
         return [credential, config];
     }
 
-    async hasClient({ account, channel }) {
+    hasClient({ account, channel }) {
         const identifier = `${channel}-${account}`;
         return this.clientMap.has(identifier);
     }
 
-    async getClient({ account, channel }) {
+    getClient({ account, channel }) {
         const identifier = `${channel}-${account}`;
         return this.clientMap.get(identifier);
     }
 
-    async setClient({ account, channel, client }) {
+    setClient({ account, channel, client }) {
         const identifier = `${channel}-${account}`;
         return this.clientMap.set(identifier, client);
     }
